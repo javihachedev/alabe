@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historias de Elx</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+    #sidebar {
+      width: 25%;
+      background-color: #f4f4f4;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    #content {
+      display: none;
+      padding: 20px;
+      width: 75%;
+    }
+	#map-container,
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    .nav-link {
+      display: block;
+      margin-bottom: 15px;
+      cursor: pointer;
+      color: #007bff;
+      text-decoration: none;
+    }
+    .nav-link:hover {
+      text-decoration: underline;
+    }
+    .location-item:hover {
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="sidebar">
+    <h2>Historias de Elx</h2>
+    <a href="#" class="nav-link" id="stories-link">Stories</a>
+    <a href="#" class="nav-link" id="about-link">About</a>
+    <a href="#" class="nav-link" id="who-we-are-link">Who We Are</a>
+    <a href="#" class="nav-link" id="introduction-link">Introduction</a>
+  </div>
+  
+  <div id="map-container">
+    <div id="map"></div>
+  </div>
+  
+  <div id="content">
+    <h2 id="content-title"></h2>
+    <p id="content-text"></p>
+  </div>
+</div>
+
+<script>
+  // Initialize Leaflet map
+  var map = L.map('map').setView([38.2669, -0.6983], 13); // Elx coordinates
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Add colored markers based on location type
+  var locations = [
+    { lat: 38.2669, lng: -0.6983, type: 'historical', name: 'Elche City Center', description: 'Explore the heart of Elche.' },
+    { lat: 38.2716, lng: -0.7122, type: 'cultural', name: 'Palmeral of Elche', description: 'A UNESCO World Heritage site.' }
+  ];
+
+  var markerColors = {
+    historical: 'red',
+    cultural: 'green',
+  };
+
+  locations.forEach(function(location) {
+    var markerColor = markerColors[location.type] || 'blue'; // Default to blue if type is not defined
+    var markerIcon = L.divIcon({
+      className: 'custom-div-icon',
+      html: `<div style="background-color:${markerColor};width:20px;height:20px;border-radius:50%;"></div>`,
+      iconSize: [20, 20]
+    });
+
+    L.marker([location.lat, location.lng], { icon: markerIcon })
+      .bindPopup(`<b>${location.name}</b><br>${location.description}`)
+      .addTo(map);
+  });
+
+  // Handle sidebar navigation clicks
+  $('#about-link').on('click', function(e) {
+    e.preventDefault();
+    showContent('About', 'This is the about page content.');
+  });
+
+  $('#who-we-are-link').on('click', function(e) {
+    e.preventDefault();
+    showContent('Who We Are', 'Learn about who we are on this page.');
+  });
+
+  $('#introduction-link').on('click', function(e) {
+    e.preventDefault();
+    showContent('Introduction', 'Here you will find an introduction to the project.');
+  });
+
+  $('#stories-link').on('click', function(e) {
+    e.preventDefault();
+    showMap();  // Ensure the map is shown when "Stories" is clicked
+  });
+
+  // Show content function
+  function showContent(title, text) {
+    $('#content-title').text(title);
+    $('#content-text').text(text);
+    $('#map-container').hide(); // Hide the map
+    $('#content').show(); // Show the content
+  }
+
+  // Show map function
+  function showMap() {
+    $('#content').hide(); // Hide the content
+    $('#map-container').show(); // Show the map
+    map.invalidateSize(); // Fix the white space issue by forcing Leaflet to recalculate map dimensions
+  }
+
+  // Ensure map is properly resized when the page loads
+  $(document).ready(function() {
+    map.invalidateSize();
+  });
+</script>
+
+</body>
+</html>
